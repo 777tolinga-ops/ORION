@@ -1,0 +1,122 @@
+MISSION ORION-7 - QUESTIONNAIRE DE CONCEPTION POO
+NOM : Olinga
+PRÉNOM : Timothee
+LIEN DU DÉPÔT GITHUB :
+
+Consigne : répondez aux 15 questions dans CE fichier texte, après avoir réalisé
+votre programme. Pour chaque réponse, citez vos classes et donnez au moins
+un exemple concret tiré de votre code. N'écrivez pas seulement des définitions.
+
+QUESTION 01 - Quelles classes avez-vous créées et quelle responsabilité unique
+ou principale avez-vous attribuée à chacune ? Pourquoi ce découpage ?
+RÉPONSE : J'ai créé sept classes :
+Joueur : gère l'oxygène et l'inventaire.
+Salle : représente une salle avec ses objets et ses sorties.
+Objet : représente un objet du jeu.
+Enigme : représente la classe mère des énigmes.
+EnigmeObjet : vérifie si le joueur possède un objet.
+EnigmeCode : vérifie si le code saisi est correct.
+StationManager : gère le déroulement et les règles de la partie.
+
+J'ai choisi ce découpage pour séparer les responsabilités.
+
+QUESTION 02 - Quelle classe pilote le déroulement global de la partie ?
+Quelles méthodes avez-vous prévues pour cela et que délèguent-elles ?
+RÉPONSE : La classe StationManager pilote le déroulement de la partie.
+J'ai créé plusieurs méthodes comme deplacer(), observer(), ramasser(), utiliser(), tenter_code(), evacuer() et terminee().
+Elle délègue la gestion de l'oxygène et de l'inventaire à Joueur, la gestion des objets présents dans les salles à Salle et la vérification des énigmes aux classes EnigmeObjet et EnigmeCode.
+
+QUESTION 03 - Où placez-vous l'oxygène du joueur ? Pourquoi ce choix plutôt
+qu'une variable globale ou une propriété accessible de partout ?
+RÉPONSE :J'ai placé l'oxygène dans la classe Joueur avec l'attribut privé self.__oxygene, initialisé à 48.
+Ce choix permet de protéger la quantité d'oxygène contre les modifications directes. Les autres classes doivent utiliser les méthodes prévues pour consulter ou modifier cette valeur.
+
+QUESTION 04 - Quelles propriétés sont publiques, protégées ou privées dans
+vos classes ? Donnez au moins trois exemples et justifiez chaque niveau d'accès.
+RÉPONSE : self.nom dans Salle est public, car les autres classes peuvent avoir besoin de connaître le nom de la salle.
+self.position dans StationManager est public pour permettre de connaître la salle actuelle.
+self.__oxygene dans Joueur est privé pour protéger la quantité d'oxygène.
+self.__inventaire dans Joueur est privé pour empêcher la modification directe de l'inventaire.
+self.__code dans EnigmeCode est privé pour protéger la valeur utilisée lors de la vérification du code.
+
+QUESTION 05 - Quelles méthodes avez-vous créées pour dépenser et recharger
+l'oxygène ? Pourquoi ces méthodes plutôt que l'accès direct à une propriété ?
+Expliquez les validations (coûts, recharge, valeur minimale/maximale).
+RÉPONSE : Dans la classe Joueur, j'ai créé les méthodes consommer(cout) et recharger().
+La méthode consommer() vérifie que le coût n'est pas négatif. Elle utilise max(0, self.__oxygene - cout) pour empêcher l'oxygène de descendre en dessous de zéro.
+La méthode recharger() vérifie que le joueur est encore vivant et utilise min(80, self.__oxygene + 30) pour ne pas dépasser la capacité maximale.
+Ces méthodes permettent de respecter les règles du jeu et de protéger l'attribut oxygène.
+La méthode payer() de StationManager permet également de vérifier que le joueur survit au coût d'une action avant d'appliquer son effet.
+
+QUESTION 06 - Quelle classe est responsable de l'inventaire et quelles méthodes
+permettent de le modifier ? Comment empêchez-vous les doubles usages ?
+RÉPONSE : La classe Joueur est responsable de l'inventaire. J'ai utilisé un dictionnaire privé appelé self.__inventaire.
+Les méthodes ajouter() et retirer() permettent de modifier l'inventaire. La méthode possede() vérifie si un objet est présent et inventaire() renvoie un tuple contenant les noms des objets.
+Pour empêcher les doublons, la méthode ajouter() vérifie si l'objet est déjà présent.
+Lorsqu'un objet est ramassé, la méthode prendre() le retire de la salle. Lorsqu'une bonbonne, un câble ou un fusible est utilisé, il est retiré de l'inventaire.
+
+QUESTION 07 - Comment représentez-vous les salles et leurs connexions ?
+Pourquoi avoir choisi cette structure (objets, listes, dictionnaires ou autre) ?
+RÉPONSE :J'ai représenté les salles avec des instances de la classe Salle, stockées dans un dictionnaire appelé self.salles dans StationManager.
+J'ai choisi un dictionnaire pour retrouver facilement une salle à partir de son nom. Les listes permettent de représenter simplement les connexions entre les salles.
+QUESTION 08 - Quelle classe décide qu'une porte peut être franchie ?
+Décrivez la collaboration entre le joueur, la salle et cette classe.
+RÉPONSE : La classe StationManager décide si une porte peut être franchie grâce à la méthode passage(destination).
+Elle vérifie d'abord si la destination existe dans les sorties de la salle actuelle.
+Ensuite, elle vérifie si la porte de maintenance est ouverte ou si le réacteur est actif, selon la destination.
+Si le passage est autorisé, la méthode deplacer() utilise payer(6), qui demande à Joueur de consommer six unités d'oxygène.
+Si le joueur est encore vivant, sa position est modifiée. Si le passage est interdit, sa position et son oxygène restent inchangés.
+
+QUESTION 09 - Comment représentez-vous les objets et leurs effets ? Un objet
+sait-il s'utiliser lui-même ou sa logique est-elle déléguée ? Pourquoi ?
+RÉPONSE :Les objets sont représentés par des instances de la classe Objet. Chaque objet possède un attribut nom.
+Les objets du jeu sont le badge, le câble, le fusible et la bonbonne.
+Dans mon programme, un objet ne sait pas s'utiliser lui-même. Sa logique est gérée par la méthode utiliser() de StationManager.
+Par exemple, le badge ouvre la porte de maintenance et la bonbonne recharge l'oxygène en appelant la méthode recharger() de Joueur.
+J'ai choisi cette organisation pour simplifier la classe Objet et centraliser les conditions d'utilisation.
+
+QUESTION 10 - Avez-vous utilisé l'héritage ? Présentez la relation entre
+classe mère et classes filles et expliquez le partage de comportement obtenu.
+RÉPONSE : Oui, j'ai utilisé l'héritage dans le fichier enigme.py.
+Enigme est la classe mère. EnigmeObjet et EnigmeCode sont les deux classes filles.
+La classe mère définit une méthode commune appelée verifier(). Les deux classes filles redéfinissent cette méthode avec leur propre comportement.
+Cela permet de donner une interface commune aux différentes énigmes et de faciliter l'ajout de nouveaux types d'énigmes.
+
+QUESTION 11 - Où apparaît le polymorphisme ? Donnez un exemple précis de
+même opération ayant un comportement différent suivant le type d'énigme.
+RÉPONSE : Le polymorphisme apparaît dans la méthode verifier() des classes EnigmeObjet et EnigmeCode.
+Dans EnigmeObjet, verifier() vérifie si le joueur possède l'objet demandé grâce à joueur.possede(self.objet).
+Dans EnigmeCode, verifier() compare la réponse du joueur au code secret avec reponse == self.__code.
+
+QUESTION 12 - Que se passe-t-il, classe par classe, lorsqu'un joueur utilise
+le badge pour ouvrir la porte de maintenance ? Décrivez les interactions.
+RÉPONSE :Le joueur sélectionne le choix 5 dans main.py et saisit badge.
+StationManager appelle la méthode utiliser("badge").
+La classe Joueur vérifie que le badge est présent dans l'inventaire grâce à possede().
+StationManager vérifie que le joueur se trouve dans le laboratoire et que la porte n'est pas déjà ouverte.
+La méthode resoudre("badge") appelle verifier() de la classe EnigmeObjet, qui confirme la possession du badge.
+Ensuite, la méthode payer(2) demande à Joueur de consommer deux unités d'oxygène.
+Si le joueur est encore vivant, StationManager passe l'attribut maintenance à True. Le passage entre le laboratoire et les machines devient accessible. Le badge reste dans l'inventaire.
+
+QUESTION 13 - Que se passe-t-il, classe par classe, lorsque le joueur tente
+de redémarrer le réacteur ? Précisez les vérifications et leurs responsables.
+RÉPONSE :Le joueur sélectionne le choix 7 dans main.py et saisit un code.
+StationManager appelle la méthode tenter_code().
+Cette méthode vérifie que le joueur se trouve dans les machines, que le réacteur n'est pas déjà actif et que le câble et le fusible sont installés.
+Si les conditions sont respectées, la méthode payer(3) demande à Joueur de consommer trois unités d'oxygène.
+
+QUESTION 14 - Comment séparez-vous l'affichage et les saisies console des
+règles métier ? Quel intérêt cela présente-t-il pour les tests et l'évolution ?
+RÉPONSE :'ai placé les affichages et les saisies dans le fichier main.py avec les fonctions print() et input().
+Les règles métier sont principalement placées dans StationManager et dans les autres classes.
+Par exemple, main.py appelle print(station.observer()), tandis que la méthode observer() vérifie l'oxygène et renvoie un résultat.
+Cette séparation permet de tester directement les méthodes sans utiliser le menu. Dans tests.py, je peux utiliser des assert pour vérifier les déplacements, l'oxygène ou les conditions de victoire.
+Elle permet également de modifier l'interface du jeu sans devoir réécrire toutes ses règles.
+
+QUESTION 15 - Si vous deviez ajouter une sixième salle, un nouvel objet et
+un troisième type d'énigme, quelles classes faudrait-il modifier ? Pourquoi ?
+Qu'amélioreriez-vous dans votre architecture actuelle ?
+RÉPONSE :Pour ajouter une sixième salle, je devrais créer une nouvelle instance de Salle dans le dictionnaire self.salles de StationManager et modifier les sorties des salles concernées.
+Pour ajouter un nouvel objet, je devrais l'ajouter aux objets d'une salle et modifier la méthode utiliser() de StationManager pour définir son effet. Je n'aurais pas forcément besoin de modifier la classe Objet.
+Pour ajouter un troisième type d'énigme, je pourrais créer une nouvelle classe fille héritant de Enigme et redéfinir la méthode verifier(). Je devrais ensuite ajouter cette nouvelle énigme dans StationManager et prévoir son utilisation.
+Pour améliorer mon architecture, je pourrais répartir davantage les règles entre les différentes classes. Par exemple, chaque type d'objet pourrait posséder sa propre méthode d'utilisation. Cela permettrait de réduire le nombre de conditions dans StationManager et de faciliter l'ajout de nouveaux objets.
